@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+   Copyright (c) 2013 Kazumasa Kohtaka. All rights reserved.
+   This file is available under the MIT license.
+ -->
+<resources>
+  <string name="app_name">BTStreamer</string>
+
+  <string name="msg_hello">Hello, World.</string>
+
+  <string name="msg_scanning">Scanning for devices...</string>
+  <string name="msg_select_device">Select a device to connect.</string>
+  <string name="msg_no_paired_devices">No devices have been paired.</string>
+  <string name="msg_no_devices">No devices are found.</string>
+  <string name="title_paired_devices">Paired Devices</string>
+  <string name="title_new_devices">New Devices</string>
+  <string name="title_scan_button">Scan for Devices</string>
+
+  <string name="insecure_connect">Connect a device</string>
+</resources>
