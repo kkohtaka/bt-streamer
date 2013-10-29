@@ -23,7 +23,7 @@ public class StreamerActivity extends Activity {
 
   private static final String TAG = "StreamerActivity";
 
-  private static final int REQUEST_CONNECT_DEVICE_INSECURE = 2;
+  private static final int REQUEST_CONNECT_DEVICE = 2;
   private static final int REQUEST_ENABLE_BT = 3;
 
   private VideoView mVideoView = null;
@@ -119,7 +119,7 @@ public class StreamerActivity extends Activity {
     switch (item.getItemId()) {
     case R.id.insecure_connect_scan:
       serverIntent = new Intent(this, DeviceListActivity.class);
-      startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_INSECURE);
+      startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE);
       return true;
     }
     return false;
@@ -127,9 +127,10 @@ public class StreamerActivity extends Activity {
 
   public void onActivityResult(int requestCode, int resultCode, Intent data) {
     switch (requestCode) {
-    case REQUEST_CONNECT_DEVICE_INSECURE:
+    case REQUEST_CONNECT_DEVICE:
       if (resultCode == Activity.RESULT_OK) {
-        connectDevice(data, true);
+        String address = data.getExtras().getString(DeviceListActivity.EXTRA_DEVICE_ADDRESS);
+        connectDevice(address);
       }
       break;
     case REQUEST_ENABLE_BT:
@@ -144,12 +145,10 @@ public class StreamerActivity extends Activity {
 
   private void setupService() {
     Log.d(TAG, "setupService()");
-
     mService = new StreamerService();
   }
 
-  private void connectDevice(Intent data, boolean secure) {
-    String address = data.getExtras().getString(DeviceListActivity.EXTRA_DEVICE_ADDRESS);
+  private void connectDevice(String address) {
     BluetoothDevice device = mBtAdapter.getRemoteDevice(address);
     mService.connect(device);
   }

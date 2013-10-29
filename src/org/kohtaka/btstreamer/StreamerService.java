@@ -20,7 +20,7 @@ public class StreamerService extends IntentService {
   private static final int BUFFER_LENGTH = 4096;
 
   private static final UUID SERVICE_UUID =
-      UUID.fromString("00000000-0000-0000-0000-00000000abcd");
+      UUID.fromString("147de4e0-40b5-11e3-b6a2-0002a5d5c51b");
 
   private static final int SERVICE_PORT = 8888;
 
