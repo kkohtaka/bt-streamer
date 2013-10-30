@@ -26,32 +26,14 @@ public class StreamerActivity extends Activity {
   private static final int REQUEST_CONNECT_DEVICE = 2;
   private static final int REQUEST_ENABLE_BT = 3;
 
-  private VideoView mVideoView = null;
-  private WebView mWebView = null;
-
   private BluetoothAdapter mBtAdapter = null;
   private StreamerService mService = null;
-
-  private final Handler mHandler = new Handler() {
-    @Override
-    public void handleMessage(Message msg) {
-      Log.d(TAG, "message: " + msg.what);
-    }
-  };
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 
     setContentView(R.layout.streamer);
-
-    mVideoView = (VideoView)findViewById(R.id.video_view);
-    //mVideoView.setVideoPath("http://devimages.apple.com/iphone/samples/bipbop/gear1/prog_index.m3u8");
-    //mVideoView.setVideoPath("http://10.0.1.2:8080/consume/first");
-    //mVideoView.start();
-    //mWebView = (WebView)findViewById(R.id.web_view);
-    //mWebView.loadUrl("file:///android_asset/index.html");
-    //mWebView.loadUrl("http://10.0.1.12/~kkohtaka/index.html");
 
     mBtAdapter = BluetoothAdapter.getDefaultAdapter();
     if (mBtAdapter == null) {
