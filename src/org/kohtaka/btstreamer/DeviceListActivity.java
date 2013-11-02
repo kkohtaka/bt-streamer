@@ -18,7 +18,8 @@ public class DeviceListActivity extends Activity {
     super.onCreate(savedInstanceState);
 
     Intent intent = new Intent();
-    intent.putExtra(EXTRA_DEVICE_ADDRESS, "00:1B:DC:05:FF:1B");
+    //intent.putExtra(EXTRA_DEVICE_ADDRESS, "00:1B:DC:05:FF:1B");
+    intent.putExtra(EXTRA_DEVICE_ADDRESS, "00:1B:DC:05:FC:61");
 
     setResult(Activity.RESULT_OK, intent);
     finish();

@@ -33,7 +33,9 @@ public class StreamerService extends IntentService {
   private static int mState;
   private ServerThread mServerThread;
   private RfcommConnectThread mRfcommConnectThread;
+  /*
   private TcpConnectThread mTcpConnectThread;
+  */
   private ProxyThread mProxyThread;
   private TcpProxyThread mTcpProxyThread;
   private BluetoothSocket mRfcommSocket;
@@ -63,7 +65,7 @@ public class StreamerService extends IntentService {
       }
 
       synchronized(StreamerService.this) {
-        mServerThread = null;
+        //mServerThread = null;
         mTcpDownstreamSocket = socket;
       }
 
@@ -73,6 +75,7 @@ public class StreamerService extends IntentService {
     public void cancel() {
       try {
         mServerSocket.close();
+        tcpClosed();
       } catch (IOException exception) {
         Log.e(TAG, "ServerSocket#close(): " + exception);
       }
@@ -119,12 +122,14 @@ public class StreamerService extends IntentService {
     public void cancel() {
       try {
         mSocket.close();
+        rfcommClosed();
       } catch (IOException exception) {
         Log.e(TAG, "BluetoothSocket#close(): " + exception);
       }
     }
   }
 
+  /*
   private class TcpConnectThread extends Thread {
     private final Socket mSocket;
 
@@ -161,6 +166,7 @@ public class StreamerService extends IntentService {
       }
     }
   }
+  */
 
   private class ProxyThread extends Thread {
     private final BluetoothSocket mRfcommSocket;
@@ -213,7 +219,7 @@ public class StreamerService extends IntentService {
           int nread;
           byte[] buffer = new byte[BUFFER_LENGTH];
           try {
-            while ((nread = mInputDownstream.read(buffer)) != 1) {
+            while ((nread = mInputDownstream.read(buffer)) != -1) {
               mOutputUpstream.write(buffer, 0, nread);
               mOutputUpstream.flush();
             }
@@ -232,10 +238,13 @@ public class StreamerService extends IntentService {
           int nread;
           byte[] buffer = new byte[BUFFER_LENGTH];
           try {
-            while ((nread = mInputUpstream.read(buffer)) != 1) {
+            while ((nread = mInputUpstream.read(buffer)) != -1) {
+              Log.d(TAG, "writting...");
               mOutputDownstream.write(buffer, 0, nread);
               mOutputDownstream.flush();
+              Log.d(TAG, "reading...");
             }
+            Log.d(TAG, "end");
             cancel();
           } catch (IOException exception) {
             try {
@@ -368,22 +377,39 @@ public class StreamerService extends IntentService {
     startProxy(device);
   }
 
-  public void startProxy(BluetoothDevice device) {
+  public void disconnect() {
+    Log.d(TAG, "StreamerService#disconnect");
 
+    stopProxy();
+  }
+
+  private void startProxy(BluetoothDevice device) {
     mDevice = device;
 
     mServerThread = new ServerThread();
     mServerThread.start();
   }
 
+  private void stopProxy() {
+    if (mServerThread != null) {
+      mServerThread.cancel();
+      mServerThread = null;
+    } else {
+      Log.d(TAG, "mServerThread is null.");
+    }
+  }
+
   private void tcpAccepted() {
+    Log.d(TAG, "StreamerService#tcpAccepted");
     if (getState() == STATE_CONNECTING) {
       if (mRfcommConnectThread != null) {
         mRfcommConnectThread.cancel();
       }
+      /*
       if (mTcpConnectThread != null) {
         mTcpConnectThread.cancel();
       }
+      */
     }
 
     if (mProxyThread != null) {
@@ -393,18 +419,29 @@ public class StreamerService extends IntentService {
       mTcpProxyThread.cancel();
     }
 
-    if (true) {
-      mRfcommConnectThread = new RfcommConnectThread(mDevice);
-      mRfcommConnectThread.start();
-    } else {
-      mTcpConnectThread = new TcpConnectThread();
-      mTcpConnectThread.start();
-    }
+    mRfcommConnectThread = new RfcommConnectThread(mDevice);
+    mRfcommConnectThread.start();
 
     setState(STATE_CONNECTING);
   }
 
+  private void tcpClosed() {
+    Log.d(TAG, "StreamerService#tcpClosed");
+    if (mRfcommConnectThread != null) {
+      mRfcommConnectThread.cancel();
+      mRfcommConnectThread = null;
+    }
+    /*
+    if (mTcpConnectThread != null) {
+      mTcpConnectThread.cancel();
+      mTcpConnectThread = null;
+    }
+    */
+    setState(STATE_NONE);
+  }
+
   private void rfcommConnected() {
+    Log.d(TAG, "StreamerService#rfcommConnected");
     if (mRfcommConnectThread != null) {
       mRfcommConnectThread.cancel();
       mRfcommConnectThread = null;
@@ -420,7 +457,17 @@ public class StreamerService extends IntentService {
     setState(STATE_CONNECTED);
   }
 
+  private void rfcommClosed() {
+    Log.d(TAG, "StreamerService#rfcommClosed");
+    if (mProxyThread != null) {
+      mProxyThread.cancel();
+      mProxyThread = null;
+    }
+  }
+
+  /*
   private void tcpConnected() {
+    Log.d(TAG, "StreamerService#tcpConnected");
     if (mTcpConnectThread != null) {
       mTcpConnectThread.cancel();
       mTcpConnectThread = null;
@@ -435,6 +482,7 @@ public class StreamerService extends IntentService {
     mTcpProxyThread.start();
     setState(STATE_CONNECTED);
   }
+  */
 
   public void start() {
     Log.d(TAG, "StreamerService#start()");

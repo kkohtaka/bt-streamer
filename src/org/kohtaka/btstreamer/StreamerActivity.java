@@ -16,6 +16,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+//import android.view.WindowManager;
 import android.widget.VideoView;
 import android.webkit.WebView;
 
@@ -60,6 +61,8 @@ public class StreamerActivity extends Activity {
   public synchronized void onResume() {
     super.onResume();
 
+    //getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
     if (mService != null) {
       if (mService.getState() == StreamerService.STATE_NONE) {
         mService.start();
@@ -71,6 +74,8 @@ public class StreamerActivity extends Activity {
   public synchronized void onPause() {
     super.onPause();
     Log.e(TAG, "- ON PAUSE -");
+
+    //getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
   }
 
   @Override

@@ -26,6 +26,7 @@ import android.view.inputmethod.BaseInputConnection;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
 import android.view.inputmethod.InputMethodManager;
+import android.view.WindowManager;
 import android.widget.AbsoluteLayout;
 import android.os.*;
 import android.util.Log;
@@ -122,6 +123,9 @@ public class SDLActivity extends Activity {
   @Override
   protected void onPause() {
     Log.v("SDL", "onPause()");
+
+    getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
     super.onPause();
     // Don't call SDLActivity.nativePause(); here, it will be called by SDLSurface::surfaceDestroyed
   }
@@ -137,6 +141,8 @@ public class SDLActivity extends Activity {
         mService.start();
       }
     }
+
+    getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
   }
 
   @Override
@@ -185,6 +191,9 @@ public class SDLActivity extends Activity {
       serverIntent = new Intent(this, DeviceListActivity.class);
       startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE);
       return true;
+    case R.id.disconnect_device:
+      disconnectDevice();
+      return true;
     }
     return false;
   }
@@ -195,6 +204,7 @@ public class SDLActivity extends Activity {
       if (resultCode == Activity.RESULT_OK) {
         String address = data.getExtras().getString(DeviceListActivity.EXTRA_DEVICE_ADDRESS);
         connectDevice(address);
+        SDLActivity.startApp();
       }
       break;
     case REQUEST_ENABLE_BT:
@@ -574,6 +584,10 @@ public class SDLActivity extends Activity {
     BluetoothDevice device = mBtAdapter.getRemoteDevice(address);
     mService.connect(device);
   }
+
+  private void disconnectDevice() {
+    mService.disconnect();
+  }
 }
 
 /**
@@ -697,7 +711,7 @@ class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
     SDLActivity.onNativeResize(width, height, sdlFormat);
     Log.v("SDL", "Window size:" + width + "x"+height);
 
-    SDLActivity.startApp();
+    //SDLActivity.startApp();
   }
 
   // unused

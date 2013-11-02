@@ -57,8 +57,9 @@ int SDL_main(int argc, char* argv[]) {
   avformat_network_init();
 
   // 1.2. Open video file
-  while (avformat_open_input(&pFormatCtx, drone_addr, NULL, NULL) != 0) {
-    __android_log_print(ANDROID_LOG_INFO, TAG, "Could not open the video file\nRetrying...\n");
+  if (avformat_open_input(&pFormatCtx, drone_addr, NULL, NULL) != 0) {
+    __android_log_print(ANDROID_LOG_INFO, TAG, "Could not open the video file\n");
+    return -1;
   }
 
   // 1.3. Retrieve stream information
@@ -109,7 +110,7 @@ int SDL_main(int argc, char* argv[]) {
   // 3.1.1 prepare SDL for YUV
   // allocate window, renderer, texture
   pWindow = SDL_CreateWindow(
-      "YUV",
+      "BTStreamer",
       0,
       0,
       pCodecCtx->width,
@@ -140,12 +141,14 @@ int SDL_main(int argc, char* argv[]) {
       __android_log_print(ANDROID_LOG_INFO, TAG, "Could not read frame!\n");
       continue;
     }
+    __android_log_print(ANDROID_LOG_INFO, TAG, "av_read_frame() done.");
 
     // decode the frame
     if (avcodec_decode_video2(pCodecCtx, pFrame, &frameDecoded, &packet) < 0) {
       __android_log_print(ANDROID_LOG_INFO, TAG, "Could not decode frame!\n");
       continue;
     }
+    __android_log_print(ANDROID_LOG_INFO, TAG, "avcodec_decode_video2() done.");
 
     if (frameDecoded) {
       // 2.1.2. convert frame to YUV for Displaying
@@ -173,9 +176,12 @@ int SDL_main(int argc, char* argv[]) {
 
     SDL_PollEvent(&event);
     switch (event.type) {
-      case SDL_KEYDOWN:
-        terminate = 1;
-        break;
+    case SDL_KEYDOWN:
+      terminate = 1;
+      break;
+    case SDL_FINGERDOWN:
+      __android_log_print(ANDROID_LOG_INFO, TAG, "SDL_FINGERDOWN");
+      break;
     }
   }
 

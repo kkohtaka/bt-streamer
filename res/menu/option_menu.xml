@@ -9,4 +9,8 @@
       android:id="@+id/insecure_connect_scan"
       android:icon="@android:drawable/ic_menu_search"
       android:title="@string/insecure_connect" />
+  <item
+      android:id="@+id/disconnect_device"
+      android:icon="@android:drawable/ic_menu_search"
+      android:title="@string/disconnect_device" />
 </menu>
